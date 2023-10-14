@@ -1,9 +1,11 @@
+import { useAtom } from 'jotai';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
+import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -11,21 +13,27 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import SettingsIcon from '@mui/icons-material/Settings';
 import UploadIcon from '@mui/icons-material/Upload';
 import Settings from './Settings';
+import ImagePreview from './ImagePreview';
+import { postAtom } from '../model/post';
+import { PostOrchestrator } from 'masbs-xposter';
+import { getAgentSettings } from '../model/settings';
 
 export default function Compose() {
     const [showSettings, setShowSettings] = useState(false);
 
-    const [text, setText] = useState('');
+    const [post, setPost] = useAtom(postAtom);
     const [mastoActivated, setMastoActivated] = useState(localStorage.getItem('mastoActivated') == 'true');
     const [bsActivated, setBSActivated] = useState(localStorage.getItem('bsActivated') == 'true');
+    let postOrchestrator : PostOrchestrator;
 
     const handleTextAreaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setText(event.target.value);
+        setPost((prevPose) => ({...prevPose, text: event.target.value}));
     };
 
     function submit(event: React.SyntheticEvent) {
         event.preventDefault();
-        console.log(text);
+        console.log(post.text);
+        postOrchestrator.post(post);
     }
 
     function onMastoStatusChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -39,8 +47,31 @@ export default function Compose() {
     }
 
     function handleSettingsSaved() {
-
+        if (postOrchestrator) {
+            //TODO destroy
+        }
+        postOrchestrator = new PostOrchestrator();
+        postOrchestrator.initializeAgents(['bluesky', 'mastodon'], getAgentSettings())
     }
+
+    function handleImageUploadChange(event) {
+        const files = event.target.files
+        if (files[0]) {
+            document.getElementById('truc').src = URL.createObjectURL(files[0])
+        }
+    }
+
+    const VisuallyHiddenInput = styled('input')({
+        clip: 'rect(0 0 0 0)',
+        clipPath: 'inset(50%)',
+        height: 1,
+        overflow: 'hidden',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        whiteSpace: 'nowrap',
+        width: 1,
+    });
 
     return (
         <div className='compose'>
@@ -67,7 +98,6 @@ export default function Compose() {
                     </FormGroup>
                     <FormGroup row style={{ marginTop: 10 }}>
                         <TextField
-                            id="outlined-textarea"
                             placeholder="What's up?"
                             multiline
                             minRows={2}
@@ -75,10 +105,14 @@ export default function Compose() {
                             style={{ width: 600 }}
                         />
                     </FormGroup>
+                    <FormGroup row style={{ marginTop: 10 }}>
+                        <ImagePreview></ImagePreview>
+                    </FormGroup>
                     <FormGroup row style={{ marginTop: 10, display: 'flex' }}>
                         <FormGroup row style={{ flexGrow: 1 }}>
-                            <IconButton size="small">
+                            <IconButton component="label" size="small">
                                 <UploadIcon />
+                                <VisuallyHiddenInput type="file" accept='image/*' onChange={handleImageUploadChange} />
                             </IconButton>
                             <IconButton size="small">
                                 <InsertEmoticonIcon />

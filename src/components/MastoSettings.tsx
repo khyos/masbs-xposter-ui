@@ -1,31 +1,25 @@
-import { useState } from 'react'
+import { useAtom } from "jotai";
 import TextField from '@mui/material/TextField';
+import { mastodonSettingsAtom } from '../model/settings';
 
-export default function MastoSettings({settings, onChange}) {
-    const [url, setUrl] = useState(settings.url)
-    const [appToken, setAppToken] = useState(settings.appToken)
+export default function MastoSettings() {
+    const [mastoSettings, setMastoSettings] = useAtom(mastodonSettingsAtom);
 
-    function mastoInstanceURLChange (event: any) {
-        setUrl(event.target.value);
-        onChange({
-            url: event.target.value,
-            appToken: appToken
-        });
+    function mastoInstanceURLChange (event: React.ChangeEvent<HTMLInputElement>) {
+        mastoSettings.url = event.target.value;
+        setMastoSettings(mastoSettings);
     }
 
-    function mastoAppTokenChange (event: any) {
-        setAppToken(event.target.value);
-        onChange({
-            url: url,
-            appToken: event.target.value
-        });
+    function mastoAppTokenChange (event: React.ChangeEvent<HTMLInputElement>) {
+        mastoSettings.appToken = event.target.value;
+        setMastoSettings(mastoSettings);
     }
     
     return (
         <div style={{display: 'flex'}}>
-            <TextField required label="Instance URL" variant="outlined" defaultValue={url} onChange={mastoInstanceURLChange} InputLabelProps={{ shrink: true }} />
+            <TextField required label="Instance URL" variant="outlined" defaultValue={mastoSettings.url} onChange={mastoInstanceURLChange} InputLabelProps={{ shrink: true }} />
             <span style={{flexGrow: 1}}></span>
-            <TextField required label="App Token" variant="outlined" defaultValue={appToken} onChange={mastoAppTokenChange} InputLabelProps={{ shrink: true }} />
+            <TextField type="password" required label="App Token" variant="outlined" defaultValue={mastoSettings.appToken} onChange={mastoAppTokenChange} InputLabelProps={{ shrink: true }} />
         </div>
     )
 }

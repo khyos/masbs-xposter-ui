@@ -6,44 +6,13 @@ import Tabs from '@mui/material/Tabs';
 import BSSettings from './BSSettings';
 import GeneralSettings from './GeneralSettings';
 import MastoSettings from './MastoSettings';
+import { persistSettings } from '../model/settings';
 
 export default function Settings({ onSave }) {
-    const [settings, setSettings] = useState({
-        general: {
-            rollbackActivated: localStorage.getItem('rollbackActivated') === 'true' ?? false,
-        },
-        mastodon: {
-            url: localStorage.getItem('mastoURL') ?? '',
-            appToken: localStorage.getItem('mastoAppToken') ?? ''
-        },
-        bluesky: {
-            handle: localStorage.getItem('bsHandle') ?? '',
-            appPassword: localStorage.getItem('bsAppPassword') ?? ''
-        }
-    });
     const [selectedSettingsTab, setSelectedSettingsTab] = useState(0);
 
-    function handleGeneralSettingsChange(generalSettings) {
-        settings.general = generalSettings;
-        setSettings(settings);
-    }
-
-    function handleMastoSettingsChange(mastoSettings) {
-        settings.mastodon = mastoSettings;
-        setSettings(settings);
-    }
-
-    function handleBskySettingsChange(bskySettings) {
-        settings.bluesky = bskySettings;
-        setSettings(settings);
-    }
-
     function updateSettings() {
-        localStorage.setItem('rollbackActivated', `${settings.general.rollbackActivated}`);
-        localStorage.setItem('mastoURL', settings.mastodon.url);
-        localStorage.setItem('mastoAppToken', settings.mastodon.appToken);
-        localStorage.setItem('bsIdentifier', settings.bluesky.handle);
-        localStorage.setItem('bsAppPassword', settings.bluesky.appPassword);
+        persistSettings();
         onSave();
     }
 
@@ -87,13 +56,13 @@ export default function Settings({ onSave }) {
                 </Tabs>
             </Box>
             <CustomTabPanel value={selectedSettingsTab} index={0}>
-                <GeneralSettings settings={settings.general} onChange={handleGeneralSettingsChange} />
+                <GeneralSettings />
             </CustomTabPanel>
             <CustomTabPanel value={selectedSettingsTab} index={1}>
-                <MastoSettings settings={settings.mastodon} onChange={handleMastoSettingsChange} />
+                <MastoSettings />
             </CustomTabPanel>
             <CustomTabPanel value={selectedSettingsTab} index={2}>
-                <BSSettings settings={settings.bluesky} onChange={handleBskySettingsChange} />
+                <BSSettings />
             </CustomTabPanel>
             <Button variant="contained" size="small" onClick={updateSettings}>Save Settings</Button>
         </>

@@ -1,25 +1,25 @@
-import { useState } from 'react'
+import { useAtom } from "jotai";
 import TextField from '@mui/material/TextField';
+import { blueskySettingsAtom } from '../model/settings';
 
-export default function BSSettings({settings, onChange}) {
-    const [identifier, setIdentifier] = useState(settings.identifier);
-    const [appPassword, setAppPassword] = useState(settings.appPassword);
+export default function BSSettings() {
+    const [blueskySettings, setBlueskySettings] = useAtom(blueskySettingsAtom);
 
-    function bsIdentifierChange (event: any) {
-        setIdentifier(event.target.value);
-        onChange(settings);
+    function bsHandleChange (event: React.ChangeEvent<HTMLInputElement>) {
+        blueskySettings.handle = event.target.value;
+        setBlueskySettings(blueskySettings);
     }
 
-    function bsAppPasswordChange (event: any) {
-        setAppPassword(event.target.value);
-        onChange(settings);
+    function bsAppPasswordChange (event: React.ChangeEvent<HTMLInputElement>) {
+        blueskySettings.appPassword = event.target.value;
+        setBlueskySettings(blueskySettings);
     }
 
     return (
         <div style={{display: 'flex'}}>
-            <TextField required label="Handle" variant="outlined" defaultValue={identifier} onChange={bsIdentifierChange} InputLabelProps={{ shrink: true }} />
+            <TextField required label="Handle" variant="outlined" defaultValue={blueskySettings.handle} onChange={bsHandleChange} InputLabelProps={{ shrink: true }} />
             <span style={{flexGrow: 1}}></span>
-            <TextField required label="App Password" variant="outlined" defaultValue={appPassword} onChange={bsAppPasswordChange} InputLabelProps={{ shrink: true }} />
+            <TextField type="password" required label="App Password" variant="outlined" defaultValue={blueskySettings.appPassword} onChange={bsAppPasswordChange} InputLabelProps={{ shrink: true }} />
         </div>
     )
 }
