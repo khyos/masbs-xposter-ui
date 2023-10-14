@@ -1,34 +1,20 @@
-import { useState } from 'react'
-import Box from '@mui/material/Box';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import Switch from '@mui/material/Switch';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import SettingsIcon from '@mui/icons-material/Settings';
 import UploadIcon from '@mui/icons-material/Upload';
-import BSSettings from './BSSettings'
-import MastoSettings from './MastoSettings'
+import Settings from './Settings';
 
 export default function Compose() {
     const [showSettings, setShowSettings] = useState(false);
-    const [settings, setSettings] = useState({
-        mastodon: {
-            url: localStorage.getItem('mastoURL') ?? '',
-            appToken: localStorage.getItem('mastoAppToken') ?? ''
-        },
-        bluesky: {
-            handle: localStorage.getItem('bsHandle') ?? '',
-            appPassword: localStorage.getItem('bsAppPassword') ?? ''
-        }
-    });
-    const [selectedSettingsTab, setSelectedSettingsTab] = useState(0);
+
     const [text, setText] = useState('');
     const [mastoActivated, setMastoActivated] = useState(localStorage.getItem('mastoActivated') == 'true');
     const [bsActivated, setBSActivated] = useState(localStorage.getItem('bsActivated') == 'true');
@@ -52,51 +38,8 @@ export default function Compose() {
         localStorage.setItem('bsActivated', `${event.target.checked}`);
     }
 
-    function updateMastoSettings(mastoSettings) {
-        settings.mastodon = mastoSettings;
-        setSettings(settings);
-    }
+    function handleSettingsSaved() {
 
-    function updateBSSettings(bsSettings) {
-        settings.bluesky = bsSettings;
-        setSettings(settings);
-    }
-
-    function updateSettings() {
-        localStorage.setItem('mastoURL', settings.mastodon.url);
-        localStorage.setItem('mastoAppToken', settings.mastodon.appToken);
-        localStorage.setItem('bsIdentifier', settings.bluesky.handle);
-        localStorage.setItem('bsAppPassword', settings.bluesky.appPassword);
-    }
-
-    interface TabPanelProps {
-        children?: React.ReactNode;
-        index: number;
-        value: number;
-    }
-
-    function CustomTabPanel(props: TabPanelProps) {
-        const { children, value, index, ...other } = props;
-
-        return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`simple-tabpanel-${index}`}
-                aria-labelledby={`simple-tab-${index}`}
-                {...other}
-            >
-                {value === index && (
-                    <Box sx={{ p: 3 }}>
-                        {children}
-                    </Box>
-                )}
-            </div>
-        );
-    }
-
-    function handleSettingsTabChange(event: React.SyntheticEvent, newValue: number) {
-        setSelectedSettingsTab(newValue);
     }
 
     return (
@@ -109,6 +52,7 @@ export default function Compose() {
                         <FormGroup row>
                             <ToggleButton
                                 size="small"
+                                value="toggleSettings"
                                 selected={showSettings}
                                 onChange={() => {
                                     setShowSettings(!showSettings);
@@ -119,19 +63,7 @@ export default function Compose() {
                         </FormGroup>
                     </FormGroup>
                     <FormGroup row style={{ marginTop: 10, display: showSettings ? 'block' : 'none' }}>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <Tabs value={selectedSettingsTab} onChange={handleSettingsTabChange}>
-                                <Tab label='Mastodon' />
-                                <Tab label='BlueSky' />
-                            </Tabs>
-                        </Box>
-                        <CustomTabPanel value={selectedSettingsTab} index={0}>
-                            <MastoSettings settings={settings.mastodon} onChange={updateMastoSettings} />
-                        </CustomTabPanel>
-                        <CustomTabPanel value={selectedSettingsTab} index={1}>
-                            <BSSettings settings={settings.bluesky} onChange={updateBSSettings} />
-                        </CustomTabPanel>
-                        <Button variant="contained" size="small" onClick={updateSettings}>Save Settings</Button>
+                        <Settings onSave={handleSettingsSaved} ></Settings>
                     </FormGroup>
                     <FormGroup row style={{ marginTop: 10 }}>
                         <TextField
