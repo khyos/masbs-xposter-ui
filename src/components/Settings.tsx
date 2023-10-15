@@ -8,7 +8,11 @@ import GeneralSettings from './GeneralSettings';
 import MastoSettings from './MastoSettings';
 import { persistSettings } from '../model/settings';
 
-export default function Settings({ onSave }) {
+interface SettingsProp {
+    onSave: () => void;
+}
+
+export default function Settings({ onSave } : SettingsProp) {
     const [selectedSettingsTab, setSelectedSettingsTab] = useState(0);
 
     function updateSettings() {

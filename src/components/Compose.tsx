@@ -15,7 +15,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import Settings from './Settings';
 import ImagePreview from './ImagePreview';
 import { postAtom } from '../model/post';
-import { PostOrchestrator } from 'masbs-xposter';
+import { Media, Post, PostOrchestrator } from 'masbs-xposter';
 import { getAgentSettings } from '../model/settings';
 
 export default function Compose() {
@@ -24,10 +24,10 @@ export default function Compose() {
     const [post, setPost] = useAtom(postAtom);
     const [mastoActivated, setMastoActivated] = useState(localStorage.getItem('mastoActivated') == 'true');
     const [bsActivated, setBSActivated] = useState(localStorage.getItem('bsActivated') == 'true');
-    let postOrchestrator : PostOrchestrator;
+    let postOrchestrator: PostOrchestrator;
 
     const handleTextAreaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPost((prevPose) => ({...prevPose, text: event.target.value}));
+        setPost((prevPost: Post) => ({ ...prevPost, text: event.target.value }));
     };
 
     function submit(event: React.SyntheticEvent) {
@@ -54,11 +54,30 @@ export default function Compose() {
         postOrchestrator.initializeAgents(['bluesky', 'mastodon'], getAgentSettings())
     }
 
-    function handleImageUploadChange(event) {
+    function handleImageUploadChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const medias = post.medias;
         const files = event.target.files
-        if (files[0]) {
-            document.getElementById('truc').src = URL.createObjectURL(files[0])
+        if (files) {
+            for (const file of files) {
+                const media: Media = {
+                    file: file
+                };
+                medias.push(media);
+            }
         }
+        setPost((prevPost: Post) => ({ ...prevPost, medias: medias }));
+    }
+
+    function handleAltTextChange(index: number, altText: string) {
+        const media = post.medias[index];
+        media.altText = altText;
+        setPost((prevPost: Post) => ({ ...prevPost }));
+    }
+
+    function handleMediaDelete(index: number) {
+        const medias = post.medias;
+        medias.splice(index, 1);
+        setPost((prevPost: Post) => ({ ...prevPost, medias: medias }));
     }
 
     const VisuallyHiddenInput = styled('input')({
@@ -105,8 +124,13 @@ export default function Compose() {
                             style={{ width: 600 }}
                         />
                     </FormGroup>
-                    <FormGroup row style={{ marginTop: 10 }}>
-                        <ImagePreview></ImagePreview>
+                    <FormGroup row style={{ marginTop: 10, display: post.medias.length > 0 ? 'block' : 'none' }}>
+                        {post.medias.map((media: Media, index: number) => {
+                            const fileURL = URL.createObjectURL(media.file);
+                            return (
+                                <ImagePreview key={index} index={index} imageSrc={fileURL} onAltTextChange={handleAltTextChange} onDelete={handleMediaDelete}></ImagePreview>
+                            );
+                        })}
                     </FormGroup>
                     <FormGroup row style={{ marginTop: 10, display: 'flex' }}>
                         <FormGroup row style={{ flexGrow: 1 }}>
