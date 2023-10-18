@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { Post, PostVisibility, PostLanguage } from 'masbs-xposter';
+import { Post, PostLanguage, PostOrchestrator, PostVisibility } from 'masbs-xposter';
 
 export interface PostDefaultSettings {
     language: string,
@@ -25,3 +25,5 @@ const initialPost: Post = {
 };
 
 export const postAtom = atom(initialPost);
+
+export const postOrchestratorAtom = atom(new PostOrchestrator());
