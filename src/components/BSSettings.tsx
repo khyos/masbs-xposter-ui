@@ -1,9 +1,9 @@
 import { useAtom } from "jotai";
 import TextField from '@mui/material/TextField';
-import { blueskySettingsAtom } from '../model/settings';
+import { bskySettingsAtom } from '../model/settings';
 
 export default function BSSettings() {
-    const [blueskySettings, setBlueskySettings] = useAtom(blueskySettingsAtom);
+    const [blueskySettings, setBlueskySettings] = useAtom(bskySettingsAtom);
 
     function bsHandleChange (event: React.ChangeEvent<HTMLInputElement>) {
         blueskySettings.handle = event.target.value;

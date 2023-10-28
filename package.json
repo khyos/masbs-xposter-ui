@@ -1,7 +1,7 @@
 {
   "name": "masbs-xposter-ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,7 @@
     "@mui/icons-material": "^5.14.13",
     "@mui/material": "^5.14.13",
     "jotai": "^2.4.3",
-    "masbs-xposter": "^0.0.6",
+    "masbs-xposter": "^0.0.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

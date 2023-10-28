@@ -40,16 +40,37 @@ export const generalSettingsAtom = atom(Object.assign({}, initialSettings.genera
 
 export const mastodonSettingsAtom = atom(Object.assign({}, initialSettings.mastodon));
 
-export const blueskySettingsAtom = atom(Object.assign({}, initialSettings.bluesky));
+export const bskySettingsAtom = atom(Object.assign({}, initialSettings.bluesky));
 
 export const savedSettingsAtom = atom(Object.assign({}, initialSettings));
+
+const mastoActivatedAtom = atom(localStorage.getItem('mastoActivated') == 'true');
+
+export const mastoActivatedAtomLS = atom(
+    (get) => get(mastoActivatedAtom),
+    (get, set, newState: boolean) => {
+        set(mastoActivatedAtom, newState)
+        localStorage.setItem('mastoActivated', `${newState}`)
+    }
+);
+
+const bskyActivatedAtom = atom(localStorage.getItem('bskyActivated') == 'true');
+
+export const bskyActivatedAtomLS = atom(
+    (get) => get(bskyActivatedAtom),
+    (get, set, newState: boolean) => {
+        set(bskyActivatedAtom, newState)
+        localStorage.setItem('bskyActivated', `${newState}`)
+    }
+);
+
 
 export const persistSettings = () => {
     const store = getDefaultStore();
     const settings = {
         general: store.get(generalSettingsAtom),
         mastodon: store.get(mastodonSettingsAtom),
-        bluesky: store.get(blueskySettingsAtom)
+        bluesky: store.get(bskySettingsAtom)
     };
     localStorage.setItem('settings', JSON.stringify(settings));
     store.set(savedSettingsAtom, settings);
@@ -60,6 +81,6 @@ export const getAgentSettings = () => {
     const savedSettings = store.get(savedSettingsAtom);
     return {
         mastodon: savedSettings.mastodon,
-        bluesky: savedSettings.bluesky,
+        bluesky: savedSettings.bluesky
     };
 };

@@ -1,5 +1,6 @@
-import { atom } from 'jotai';
-import { Post, PostLanguage, PostOrchestrator, PostVisibility } from 'masbs-xposter';
+import { atom, getDefaultStore } from 'jotai';
+import { BSAgent, MastoAgent, Post, PostLanguage, PostOrchestrator, PostVisibility } from 'masbs-xposter';
+import { getAgentSettings } from '../model/settings';
 
 export interface PostDefaultSettings {
     language: string,
@@ -27,3 +28,11 @@ const initialPost: Post = {
 export const postAtom = atom(initialPost);
 
 export const postOrchestratorAtom = atom(new PostOrchestrator());
+
+export const initializeAgents = () => {
+    const store = getDefaultStore();
+    const postOrchestrator = store.get(postOrchestratorAtom);
+    return postOrchestrator.initializeAgents([BSAgent.ID, MastoAgent.ID], getAgentSettings());
+};
+
+initializeAgents();

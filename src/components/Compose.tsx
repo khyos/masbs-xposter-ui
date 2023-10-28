@@ -1,4 +1,4 @@
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -14,17 +14,17 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import UploadIcon from '@mui/icons-material/Upload';
 import Settings from './Settings';
 import ImagePreview from './ImagePreview';
-import { postAtom, postOrchestratorAtom } from '../model/post';
+import { initializeAgents, postAtom, postOrchestratorAtom } from '../model/post';
+import { mastoActivatedAtomLS, bskyActivatedAtomLS } from '../model/settings';
 import { BSAgent, MastoAgent, Media, Post } from 'masbs-xposter';
-import { getAgentSettings } from '../model/settings';
 
 export default function Compose() {
     const [showSettings, setShowSettings] = useState(false);
 
     const [post, setPost] = useAtom(postAtom);
-    const [postOrchestrator, setPostOrchestrator] = useAtom(postOrchestratorAtom);
-    const [mastoActivated, setMastoActivated] = useState(localStorage.getItem('mastoActivated') == 'true');
-    const [bsActivated, setBSActivated] = useState(localStorage.getItem('bsActivated') == 'true');
+    const postOrchestrator = useAtomValue(postOrchestratorAtom);
+    const [mastoActivated, setMastoActivated] = useAtom(mastoActivatedAtomLS);
+    const [bsActivated, setBSActivated] = useAtom(bskyActivatedAtomLS);
 
     function handleTextAreaChange (event: React.ChangeEvent<HTMLInputElement>) {
         setPost((prevPost: Post) => ({ ...prevPost, text: event.target.value }));
@@ -43,24 +43,19 @@ export default function Compose() {
     function onMastoStatusChange(event: React.ChangeEvent<HTMLInputElement>) {
         setMastoActivated(event.target.checked);
         postOrchestrator.getAgentByID(MastoAgent.ID).activated = event.target.checked;
-        localStorage.setItem('mastoActivated', `${event.target.checked}`);
         validatePost();
     }
 
     function onBSStatusChange(event: React.ChangeEvent<HTMLInputElement>) {
         setBSActivated(event.target.checked);
         postOrchestrator.getAgentByID(BSAgent.ID).activated = event.target.checked;
-        localStorage.setItem('bsActivated', `${event.target.checked}`);
         validatePost();
     }
 
     function handleSettingsSaved() {
-        if (postOrchestrator) {
-            //TODO destroy
-        }
-        postOrchestrator.initializeAgents([BSAgent.ID, MastoAgent.ID], getAgentSettings()).then(() => {
+        initializeAgents.then(() => {
             validatePost();
-        });
+        })
     }
 
     function handleImageUploadChange(event: React.ChangeEvent<HTMLInputElement>) {
