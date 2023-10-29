@@ -1,9 +1,9 @@
 import { useAtom } from "jotai";
 import TextField from '@mui/material/TextField';
-import { mastodonSettingsAtom } from '../model/settings';
+import { mastoSettingsAtom } from '../model/settings';
 
 export default function MastoSettings() {
-    const [mastoSettings, setMastoSettings] = useAtom(mastodonSettingsAtom);
+    const [mastoSettings, setMastoSettings] = useAtom(mastoSettingsAtom);
 
     function mastoInstanceURLChange (event: React.ChangeEvent<HTMLInputElement>) {
         mastoSettings.url = event.target.value;

@@ -6,8 +6,6 @@ import Tabs from '@mui/material/Tabs';
 import BSSettings from './BSSettings';
 import GeneralSettings from './GeneralSettings';
 import MastoSettings from './MastoSettings';
-import { persistSettings } from '../model/settings';
-
 interface SettingsProp {
     onSave: () => void;
 }
@@ -16,7 +14,6 @@ export default function Settings({ onSave } : SettingsProp) {
     const [selectedSettingsTab, setSelectedSettingsTab] = useState(0);
 
     function updateSettings() {
-        persistSettings();
         onSave();
     }
 

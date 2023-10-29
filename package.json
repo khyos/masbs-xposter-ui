@@ -15,7 +15,7 @@
     "@mui/icons-material": "^5.14.13",
     "@mui/material": "^5.14.13",
     "jotai": "^2.4.3",
-    "masbs-xposter": "^0.0.8",
+    "masbs-xposter": "^0.0.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -1,6 +1,6 @@
 import { atom, getDefaultStore } from 'jotai';
-import { BSAgent, MastoAgent, Post, PostLanguage, PostOrchestrator, PostVisibility } from 'masbs-xposter';
-import { getAgentSettings } from '../model/settings';
+import { BskyAgentConfiguration, MastoAgentConfiguration, Post, PostLanguage, PostOrchestrator, PostVisibility } from 'masbs-xposter';
+import { bskySettingsAtom, mastoSettingsAtom } from '../model/settings';
 
 export interface PostDefaultSettings {
     language: string,
@@ -32,7 +32,16 @@ export const postOrchestratorAtom = atom(new PostOrchestrator());
 export const initializeAgents = () => {
     const store = getDefaultStore();
     const postOrchestrator = store.get(postOrchestratorAtom);
-    return postOrchestrator.initializeAgents([BSAgent.ID, MastoAgent.ID], getAgentSettings());
+    const bskySettings = store.get(bskySettingsAtom);
+    const mastoSettings = store.get(mastoSettingsAtom);
+    return postOrchestrator.initializeAgents([
+        new BskyAgentConfiguration(
+            bskySettings.handle, bskySettings.appPassword, bskySettings.activated
+        ), 
+        new MastoAgentConfiguration(
+            mastoSettings.url, mastoSettings.appToken, mastoSettings.activated
+        )
+    ]);
 };
 
 initializeAgents();

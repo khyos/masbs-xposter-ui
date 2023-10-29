@@ -15,16 +15,16 @@ import UploadIcon from '@mui/icons-material/Upload';
 import Settings from './Settings';
 import ImagePreview from './ImagePreview';
 import { initializeAgents, postAtom, postOrchestratorAtom } from '../model/post';
-import { mastoActivatedAtomLS, bskyActivatedAtomLS } from '../model/settings';
-import { BSAgent, MastoAgent, Media, Post } from 'masbs-xposter';
+import { mastoSettingsAtom, bskySettingsAtom } from '../model/settings';
+import { BskyAgentConfiguration, MastoAgentConfiguration, Media, Post } from 'masbs-xposter';
 
 export default function Compose() {
     const [showSettings, setShowSettings] = useState(false);
 
     const [post, setPost] = useAtom(postAtom);
     const postOrchestrator = useAtomValue(postOrchestratorAtom);
-    const [mastoActivated, setMastoActivated] = useAtom(mastoActivatedAtomLS);
-    const [bsActivated, setBSActivated] = useAtom(bskyActivatedAtomLS);
+    const [mastoSettings, setMastoSettings] = useAtom(mastoSettingsAtom);
+    const [bskySettings, setBskySettings] = useAtom(bskySettingsAtom);
 
     function handleTextAreaChange (event: React.ChangeEvent<HTMLInputElement>) {
         setPost((prevPost: Post) => ({ ...prevPost, text: event.target.value }));
@@ -41,14 +41,14 @@ export default function Compose() {
     }
 
     function onMastoStatusChange(event: React.ChangeEvent<HTMLInputElement>) {
-        setMastoActivated(event.target.checked);
-        postOrchestrator.getAgentByID(MastoAgent.ID).activated = event.target.checked;
+        setMastoSettings((prevMastoSettings: Post) => ({ ...prevMastoSettings, activated: event.target.checked }));
+        postOrchestrator.getAgentByID(MastoAgentConfiguration.ID).activated = event.target.checked;
         validatePost();
     }
 
     function onBSStatusChange(event: React.ChangeEvent<HTMLInputElement>) {
-        setBSActivated(event.target.checked);
-        postOrchestrator.getAgentByID(BSAgent.ID).activated = event.target.checked;
+        setBskySettings((prevBskySettings: Post) => ({ ...prevBskySettings, activated: event.target.checked }));
+        postOrchestrator.getAgentByID(BskyAgentConfiguration.ID).activated = event.target.checked;
         validatePost();
     }
 
@@ -148,13 +148,13 @@ export default function Compose() {
                         <FormGroup row>
                             <FormControlLabel
                                 control={
-                                    <Switch checked={mastoActivated} onChange={onMastoStatusChange} name="masto" />
+                                    <Switch checked={mastoSettings.activated} onChange={onMastoStatusChange} name="masto" />
                                 }
                                 label='Mastodon'
                             />
                             <FormControlLabel
                                 control={
-                                    <Switch checked={bsActivated} onChange={onBSStatusChange} name="bsky" />
+                                    <Switch checked={bskySettings.activated} onChange={onBSStatusChange} name="bsky" />
                                 }
                                 label='BlueSky'
                             />
