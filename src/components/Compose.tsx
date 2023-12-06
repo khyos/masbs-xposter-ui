@@ -1,11 +1,14 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { useState } from 'react';
+import Alert from '@mui/material/Alert';
+import { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
+import Snackbar from '@mui/material/Snackbar';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -19,14 +22,17 @@ import { mastoSettingsAtom, bskySettingsAtom } from '../model/settings';
 import { BskyAgentConfiguration, MastoAgentConfiguration, Media, Post } from 'masbs-xposter';
 
 export default function Compose() {
+    const [message, setMessage] = useState('');
+    const [messageStatus, setMessageStatus] = useState<AlertColor>('success');
     const [showSettings, setShowSettings] = useState(false);
+    const [showMessage, setShowMessage] = useState(false);
 
     const [post, setPost] = useAtom(postAtom);
     const postOrchestrator = useAtomValue(postOrchestratorAtom);
     const [mastoSettings, setMastoSettings] = useAtom(mastoSettingsAtom);
     const [bskySettings, setBskySettings] = useAtom(bskySettingsAtom);
 
-    function handleTextAreaChange (event: React.ChangeEvent<HTMLInputElement>) {
+    function handleTextAreaChange(event: React.ChangeEvent<HTMLInputElement>) {
         setPost((prevPost: Post) => ({ ...prevPost, text: event.target.value }));
     }
 
@@ -37,7 +43,21 @@ export default function Compose() {
     function submit(event: React.SyntheticEvent) {
         event.preventDefault();
         console.log(post.text);
-        postOrchestrator.post(post);
+        postOrchestrator.post(post).then(() => {
+            setMessage('Post Successful');
+            setMessageStatus('success');
+            setShowMessage(true);
+            window.setTimeout(() => {
+                setShowMessage(false);
+            }, 3000);
+        }).catch(() => {
+            setMessage('Post Error');
+            setMessageStatus('error');
+            setShowMessage(true);
+            window.setTimeout(() => {
+                setShowMessage(false);
+            }, 3000);
+        });
     }
 
     function onMastoStatusChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -163,6 +183,11 @@ export default function Compose() {
                     </FormGroup>
                 </FormControl>
             </form>
+            <Snackbar open={showMessage} anchorOrigin={{ vertical: 'bottom', horizontal:'center' }}>
+                <Alert severity={messageStatus} sx={{ width: '100%' }}>
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }
